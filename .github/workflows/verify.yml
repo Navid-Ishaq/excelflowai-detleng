@@ -1,4 +1,4 @@
-name: Verify ExcelFlow AI
+name: Build and deploy ExcelFlow AI
 on:
   push:
     branches: [main]
@@ -6,9 +6,15 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: excelflow-pages-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  verify:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,4 +23,30 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      - name: Build browser application
+        run: npm run build
+        env:
+          VITE_AI_URL: ${{ vars.VITE_AI_URL }}
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - name: Upload built site only
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy built browser application
+        id: deployment
+        uses: actions/deploy-pages@v4

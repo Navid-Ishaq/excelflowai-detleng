@@ -54,3 +54,11 @@ Dependency audit currently has five moderate transitive advisories in Mastra's d
 Frontend output is `dist/`; its CNAME targets `excelflowai.detleng.com`. A static host serves this build, never raw source. Before building for a separate public backend, set `VITE_AI_URL` to its HTTPS `/api` URL. The Node service runs `npm run server`, uses `PORT`, and restricts `ALLOWED_ORIGIN` to the frontend origin. Store the OpenAI key only in the service environment; disable body/access-content logging, and use `/api/health` for readiness. Public AI endpoints need a cost budget and an appropriate abuse-control review before exposure. Backend cold starts can require retry.
 
 No GitHub push or deployment has been performed. No real demo video is bundled. Required library notices are in THIRD_PARTY_NOTICES.md and LICENSES/.
+
+## GitHub Pages publishing
+
+In repository Settings > Pages > Build and deployment, set Source to **GitHub Actions**, keeping the custom domain `excelflowai.detleng.com`. The Build and deploy ExcelFlow AI workflow tests, builds and publishes only `dist/` on a main-branch push or manual dispatch. Pull requests verify the build without deploying. Raw `main / root` hosting cannot run the TypeScript source and can show a blank page. The `public/CNAME` is copied into the build. Enable Enforce HTTPS when GitHub makes it available.
+
+The frontend deployment does not host the Node AI backend. Configure the public backend separately and set the repository variable VITE_AI_URL to its HTTPS `/api` address before building. Without it, local reporting remains available while remote AI is unavailable.
+
+For local use, keep a PowerShell terminal running `npm run dev` and visit http://127.0.0.1:5180. Closing that terminal stops the local site; pushing to GitHub does not start a local server.
