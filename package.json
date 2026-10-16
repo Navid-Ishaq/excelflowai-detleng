@@ -1,0 +1,49 @@
+{
+  "name": "excelflowai-detleng",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5180",
+    "server": "tsx --env-file-if-exists=.env server/index.ts",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "tsx tests/browser.ts",
+    "check": "tsc --noEmit",
+    "test:reset": "tsx tests/reset-browser.ts",
+    "format:check": "prettier --check src server tests index.html vite.config.ts"
+  },
+  "dependencies": {
+    "@mastra/core": "1.78.0",
+    "chart.js": "4.5.1",
+    "exceljs": "4.4.0",
+    "jspdf": "4.2.1",
+    "jszip": "3.10.1",
+    "papaparse": "5.7.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "@types/papaparse": "5.5.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "axe-core": "4.14.0",
+    "prettier": "3.9.10",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vite": "7.3.7"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
+  },
+  "optionalDependencies": {
+    "@esbuild/win32-x64": "0.28.2",
+    "@rollup/rollup-win32-x64-msvc": "4.64.7"
+  }
+}
