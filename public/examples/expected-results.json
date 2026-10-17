@@ -1,0 +1,30 @@
+{
+  "fictional": true,
+  "source": "fictional-side-hustle.xlsx",
+  "rows": 60,
+  "invalidAmounts": 1,
+  "roles": {
+    "Date": 0,
+    "Description": 1,
+    "Amount": 2,
+    "Category": 3,
+    "Currency": 4
+  },
+  "currencies": [
+    {
+      "currency": "EUR",
+      "totalIn": 6806,
+      "totalOut": -1965,
+      "net": 4841,
+      "count": 59
+    },
+    {
+      "currency": "USD",
+      "totalIn": 0,
+      "totalOut": -79,
+      "net": -79,
+      "count": 1
+    }
+  ],
+  "note": "Cash flow is not profit. The pending amount is retained and excluded from amount sums."
+}

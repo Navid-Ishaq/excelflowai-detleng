@@ -42,7 +42,7 @@ export function workbookBuilder(host,{home,use,create}){
   for(const [id,s]of [['builder-edit-columns',1],['builder-edit-settings',3]])if($(id))$(id).onclick=()=>{step=s;render();focus();};
   for(const mode of ['blank','sample'])if($(`builder-${mode}`))$(`builder-${mode}`).onclick=()=>{try{validateDefinition(d);if(mode==='sample')sampleRange(d);busy=true;stage='Building workbook structure…';render();client.send({type:'build',definition:d,mode});}catch(e){busy=false;error(e.message);}};
   if($('builder-cancel'))$('builder-cancel').onclick=()=>{client.cancel();busy=false;render();error('Generation canceled. Adjust your settings or try again.');};
-  if($('builder-use'))$('builder-use').onclick=()=>use(result.model,result.name,result.buffer.byteLength);
+  if($('builder-use'))$('builder-use').onclick=()=>use(result.model,result.name,result.buffer.byteLength,result.buffer.slice(0));
   if($('builder-another'))$('builder-another').onclick=$('builder-over').onclick;
   if($('builder-adjust'))$('builder-adjust').onclick=()=>{result=null;if(url)URL.revokeObjectURL(url);url=null;step=4;render();focus();};
  }

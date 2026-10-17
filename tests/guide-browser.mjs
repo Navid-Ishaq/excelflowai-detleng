@@ -20,7 +20,7 @@ await page.locator('[data-select=by]').selectOption('Product');await page.locato
 await page.locator('.experience-demo summary').click();await page.locator('[data-metric="Transaction Count"]').click();assert(await page.locator('.experience-demo details').getAttribute('open')!==null);
 await page.locator('[data-reset]').click();assert.match(await page.locator('.experience-kpis').innerText(),/12,500/);
 await page.locator('[data-next]').click();await page.locator('[data-recognize]').click();assert.match(await page.locator('[data-recognized]').innerText(),/recognized/);
-await page.locator('[data-next]').click();assert.match(await page.locator('.experience').innerText(),/Preview limited to 20 rows/);
+await page.locator('[data-next]').click();assert.match(await page.locator('.experience').innerText(),/AI Analyst/);await page.locator('[data-next]').click();assert.match(await page.locator('.experience').innerText(),/Preview limited to 20 rows/);
 await page.locator('[data-back]').click();await page.locator('[data-restart]').click();assert.match(await page.locator('.experience h1').innerText(),/Welcome/);
 await page.addScriptTag({path:'node_modules/axe-core/axe.min.js'});
 for(const width of [1440,1024,768,390]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.querySelector('.experience').scrollWidth>document.querySelector('.experience').clientWidth),false);const result=await page.evaluate(()=>axe.run(document.querySelector('.experience')));assert.deepEqual(result.violations.filter(x=>['serious','critical'].includes(x.impact)).map(x=>x.id),[]);}

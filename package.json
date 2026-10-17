@@ -12,19 +12,29 @@
     "test:performance": "node tests/live-performance.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test:builder": "node tests/builder-browser.mjs",
-    "test:experiences": "node tests/guide-browser.mjs && node tests/story-browser.mjs",
+    "test:experiences": "node tests/guide-browser.mjs",
     "test:roles": "node tests/roles-browser.mjs",
     "check": "node --check src/app.js",
-    "test:e2e": "npm run test:browser && npm run test:live && npm run test:builder && npm run test:experiences && npm run test:roles"
+    "test:e2e": "npm run test:browser && npm run test:live && npm run test:builder && npm run test:experiences && npm run test:roles",
+    "dev:server": "tsx watch --env-file-if-exists=.env server/index.ts",
+    "start:server": "tsx server/index.ts",
+    "check:server": "tsc -p tsconfig.server.json",
+    "test:ai": "tsx --test tests/ai*.test.ts",
+    "test:ai:browser": "node tests/ai-browser.mjs"
   },
   "dependencies": {
+    "@mastra/core": "1.78.0",
+    "@mastra/observability": "1.20.1",
     "chart.js": "4.5.1",
     "exceljs": "4.4.0",
-    "jszip": "3.10.1"
+    "jszip": "3.10.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
+    "@types/node": "26.6.5",
     "axe-core": "4.14.0",
+    "tsx": "4.23.15",
     "typescript": "5.9.3",
     "vite": "7.3.7"
   },

@@ -6,10 +6,11 @@ export const SCENES={
  report:['A workbook you can understand.','Click a sheet to see what it contains. Only your selected reports are generated.'],
  live:['Ask a question. See the picture change.','Try these fictional filters. This is an illustrative sample, separate from your business data.'],
  return:['Welcome back to your report.','A downloaded ExcelFlow AI workbook can return to the same Live Analytics experience.'],
- privacy:['Your workbook stays on your device.','Processing happens locally in your browser. Your original file remains untouched.'],
+ ai:['Meet your AI Analyst.','After your report is ready, investigate the full supplied dataset with OpenAI and Mastra.'],
+ privacy:['Understand your data access.','Reports are local. Connecting AI shares supplied data after authorization. Your original file remains untouched.'],
  ready:['Build. Create. Analyze. Explore.','Business data in. Clear understanding out.']
 };
-export const JOURNEYS={all:['welcome','build','create','report','live','return','privacy','ready'],build:['build','create','report','live','return','privacy','ready'],create:['create','report','live','return','privacy','ready'],explore:['return','live','privacy','ready']};
+export const JOURNEYS={all:['welcome','build','create','report','live','return','ai','privacy','ready'],build:['build','create','report','live','return','ai','privacy','ready'],create:['create','report','live','return','ai','privacy','ready'],explore:['return','live','ai','privacy','ready']};
 export const SHEETS={
  'Report Data':'Your selected detailed records, including zero amounts.',
  'Inflows':'Transactions where Amount is greater than zero.',
