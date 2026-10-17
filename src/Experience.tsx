@@ -98,7 +98,7 @@ const story = [
   ],
   [
     "Explain with evidence",
-    "Optional AI adds a conversational layer. Its statements must refer to the checked context available in the current session.",
+    "AI adds a conversational layer. Its statements must refer to the checked context available in the current session.",
     "Useful answers have a foundation.",
   ],
   [

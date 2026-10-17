@@ -1155,3 +1155,62 @@ footer b span {
 canvas {
   max-width: 100%;
 }
+
+.hero-video {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 24px;
+  min-width: 0;
+}
+.hero-video .video-placeholder {
+  min-height: 220px;
+  margin-top: 16px;
+}
+.upload-dropzone {
+  border: 2px dashed var(--accent);
+  border-radius: 18px;
+  padding: 48px 24px;
+  text-align: center;
+  background: #f6f7ff;
+}
+.product-footer {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 32px;
+}
+.product-footer > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.product-footer a {
+  color: inherit;
+}
+@media (max-width: 760px) {
+  .product-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero-video .video-placeholder {
+    min-height: 150px;
+  }
+  .hero {
+    gap: 20px;
+    padding-top: 24px;
+  }
+  .hero h1 {
+    font-size: 2.3rem;
+  }
+}
+@media (max-width: 450px) {
+  .product-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero-video {
+    order: -1;
+  }
+}

@@ -60,7 +60,22 @@ try {
     await p.evaluate(() => localStorage.length + sessionStorage.length),
     0,
   );
-  await p.route("**/*file-worker*", (route) => route.abort());
+  // A real worker startup error remains deterministic even when module URLs are cached.
+  await p.evaluate(() => {
+    const NativeWorker = window.Worker;
+    window.Worker = class extends NativeWorker {
+      constructor(_url: string | URL, options?: WorkerOptions) {
+        super(
+          URL.createObjectURL(
+            new Blob(["throw new Error('Controlled worker startup failure')"], {
+              type: "text/javascript",
+            }),
+          ),
+          options,
+        );
+      }
+    };
+  });
   await p
     .getByRole("button", { name: "Upload source file", exact: false })
     .click();

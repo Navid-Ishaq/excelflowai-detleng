@@ -31,7 +31,8 @@ export type GroupConfig = {
   column: number;
   level: "value" | "day" | "week" | "month" | "quarter" | "year";
   values: string[];
-  sort: "label" | "net" | "count";
+  mode?: "all" | "one" | "selected";
+  sort: "label" | "net" | "count" | "inflow" | "outflow";
   descending: boolean;
   chart: boolean;
 };
@@ -42,6 +43,7 @@ export type Config = {
   numberStyle: "point" | "comma";
   dateOrder: "DMY" | "MDY" | "YMD";
   reports: string[];
+  timeGrouping?: "auto" | "day" | "week" | "month" | "quarter" | "year";
   period: string;
   start: string;
   end: string;
@@ -138,7 +140,7 @@ export const initialConfig = (): Config => ({
   mapping: {},
   numberStyle: "point",
   dateOrder: "DMY",
-  reports: ["Report Data", "Inflows", "Outflows", "Analysis"],
+  reports: ["Report Data", "Inflows", "Outflows"],
   period: "all",
   start: "",
   end: "",

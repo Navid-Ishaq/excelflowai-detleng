@@ -23,7 +23,10 @@ export function numeric(
 ): number | null {
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
   if (typeof v !== "string" || !v.trim()) return null;
-  let s = v.trim().replace(/\u2212/g, "-");
+  let s = v
+    .trim()
+    .replace(/[\s\u00a0]/g, "")
+    .replace(/\u2212/g, "-");
   const neg = /^\(.*\)$/.test(s);
   if (neg) s = s.slice(1, -1);
   const pattern =
@@ -182,7 +185,11 @@ export function groups(rows: RecordRow[], g: GroupConfig): GroupRow[] {
         : day(raw, g.dateOrder || "DMY", g.date1904)
           ? bucket(day(raw, g.dateOrder || "DMY", g.date1904)!, g.level)
           : "(Invalid date)";
-    if (g.values.length && !g.values.includes(key)) continue;
+    if (
+      ((g.mode && g.mode !== "all") || (!g.mode && g.values.length)) &&
+      !g.values.includes(key)
+    )
+      continue;
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(row);
   }
@@ -196,9 +203,7 @@ export function groups(rows: RecordRow[], g: GroupConfig): GroupRow[] {
       (a, b) =>
         (g.sort === "label"
           ? a.label.localeCompare(b.label, undefined, { numeric: true })
-          : g.sort === "net"
-            ? a.net - b.net
-            : a.count - b.count) * (g.descending ? -1 : 1),
+          : a[g.sort] - b[g.sort]) * (g.descending ? -1 : 1),
     );
 }
 const alias: Record<string, string[]> = {
@@ -213,6 +218,10 @@ const alias: Record<string, string[]> = {
     "orderdate",
     "paymentdate",
     "settlementdate",
+    "valuedate",
+    "buchungsdatum",
+    "dateoperation",
+    "تاریخ",
   ],
   Amount: [
     "amount",
@@ -222,6 +231,10 @@ const alias: Record<string, string[]> = {
     "montant",
     "netamount",
     "transactionamount",
+    "txnamount",
+    "value",
+    "valor",
+    "رقم",
   ],
   Description: [
     "description",
@@ -229,13 +242,59 @@ const alias: Record<string, string[]> = {
     "concepto",
     "concept",
     "beschreibung",
+    "transactiondescription",
+    "libelle",
+    "تفصیل",
   ],
-  Details: ["details", "detalle", "movimiento", "movement"],
-  Category: ["category", "categoria", "kategorie"],
-  Notes: ["notes", "notas", "observaciones", "remarks"],
-  Reference: ["reference", "ref", "referencia", "referenz"],
-  Currency: ["currency", "divisa", "moneda", "ccy"],
-  Balance: ["balance", "saldo", "disponible", "bankbalance"],
+  Details: [
+    "details",
+    "detail",
+    "transactiondetails",
+    "detalle",
+    "detalles",
+    "movimiento",
+    "movement",
+  ],
+  Category: ["category", "categories", "categoria", "categorie", "kategorie"],
+  Notes: [
+    "notes",
+    "note",
+    "notas",
+    "observations",
+    "observaciones",
+    "remarks",
+    "comment",
+    "comments",
+    "remarques",
+    "anmerkungen",
+  ],
+  Reference: [
+    "reference",
+    "ref",
+    "referencia",
+    "referenz",
+    "transactionref",
+    "transactionreference",
+    "txnref",
+    "invoicereference",
+  ],
+  Currency: [
+    "currency",
+    "currencycode",
+    "divisa",
+    "moneda",
+    "ccy",
+    "devise",
+    "wahrung",
+  ],
+  Balance: [
+    "balance",
+    "saldo",
+    "bankbalance",
+    "accountbalance",
+    "solde",
+    "kontostand",
+  ],
 };
 export function suggest(
   source: Source,
@@ -260,6 +319,30 @@ export function suggest(
       .map((r) => r[i])
       .filter((v) => v != null && v !== "")
       .slice(0, 128);
+    const knownHeading = Object.values(alias).some((names) =>
+      names.includes(heading),
+    );
+    if (!knownHeading && vals.length >= 3) {
+      if (
+        vals.every(
+          (v) =>
+            typeof v === "string" &&
+            /^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(v) &&
+            day(v, c.dateOrder) != null,
+        )
+      )
+        (candidates.Date ??= []).push(i);
+      else if (
+        vals.every(
+          (v) =>
+            typeof v === "string" &&
+            /^[A-Z]{3}$/i.test(v) &&
+            knownCurrency(v.toUpperCase()) &&
+            knownCurrency(v.toUpperCase()),
+        )
+      )
+        (candidates.Currency ??= []).push(i);
+    }
     for (const [role, names] of Object.entries(alias)) {
       if (!names.includes(heading)) continue;
       const good = vals.length
@@ -269,7 +352,9 @@ export function suggest(
               : role === "Amount" || role === "Balance"
                 ? numeric(v, c.numberStyle) != null
                 : role === "Currency"
-                  ? typeof v === "string" && /^[A-Z]{3}$/i.test(v)
+                  ? typeof v === "string" &&
+                    /^[A-Z]{3}$/i.test(v) &&
+                    knownCurrency(v.toUpperCase())
                   : role === "Reference"
                     ? typeof v === "string" || typeof v === "number"
                     : typeof v === "string",
@@ -277,7 +362,12 @@ export function suggest(
             vals.length >=
           0.9
         : !["Date", "Amount", "Balance", "Currency"].includes(role);
-      if (good) (candidates[role] ??= []).push(i);
+      if (
+        good &&
+        (role !== "Reference" ||
+          new Set(vals.map(String)).size / Math.max(1, vals.length) >= 0.6)
+      )
+        (candidates[role] ??= []).push(i);
     }
   }
   for (const [role, ids] of Object.entries(candidates)) {
@@ -297,31 +387,40 @@ export function suggest(
   }
   return { mapping, ambiguous };
 }
+export function sourceColumns(source: Source) {
+  const width = source.rows[source.header]?.length || 0,
+    found = new Set<number>();
+  for (let r = source.header; r < source.rows.length && found.size < width; r++)
+    for (let i = 0; i < width; i++)
+      if (
+        !found.has(i) &&
+        source.rows[r][i] != null &&
+        source.rows[r][i] !== ""
+      )
+        found.add(i);
+  return [...found].sort((a, b) => a - b);
+}
 export function inferHeader(rows: Value[][]) {
-  let best = 0,
-    score = -Infinity;
-  for (let i = 0; i < Math.min(rows.length, 50); i++) {
-    const r = rows[i],
-      filled = r.filter((v) => v != null && v !== "");
-    if (!filled.length) continue;
-    const text = filled.filter(
-      (v) =>
-        typeof v === "string" &&
-        numeric(v) == null &&
-        !/^\d{4}-\d{2}-\d{2}/.test(v),
-    );
-    const matches = filled.filter((v) =>
-      Object.values(alias)
-        .flat()
-        .includes(normalize(String(v))),
-    );
-    const n = filled.length + text.length + matches.length * 4 - i * 0.02;
-    if (n > score) {
-      score = n;
-      best = i;
+  let winner = 0,
+    highest = -Infinity;
+  // Workbook heading bands repeat merged text; genuine headers have distinct labels.
+  rows.slice(0, 50).forEach((row, index) => {
+    const filled = row.filter((v) => v != null && v !== "");
+    const text = filled.filter((v) => typeof v === "string");
+    if (text.length < 2) return;
+    const unique = new Set(text.map((v) => String(v).trim())).size;
+    const repeated = text.length - unique;
+    const following = (rows[index + 1] || []).filter(
+      (v) => v != null && v !== "",
+    ).length;
+    const score =
+      text.length * 2 + filled.length + following / 10 - repeated * 4;
+    if (score > highest) {
+      highest = score;
+      winner = index;
     }
-  }
-  return best;
+  });
+  return winner;
 }
 export function prepare(source: Source, c: Config): Dataset {
   if (!c.selected.length) throw Error("Choose at least one column.");
@@ -330,7 +429,7 @@ export function prepare(source: Source, c: Config): Dataset {
   if (new Set(ids).size !== ids.length)
     throw Error("Each column can have only one role.");
   if (
-    c.reports.some((s) => ["Inflows", "Outflows", "Analysis"].includes(s)) &&
+    c.reports.some((s) => ["Inflows", "Outflows"].includes(s)) &&
     c.mapping.Amount == null
   )
     throw Error("Choose an Amount column for financial reports.");
@@ -382,21 +481,43 @@ export function prepare(source: Source, c: Config): Dataset {
   if (!records.length)
     throw Error("No records match this period. Adjust your selection.");
   if (
-    c.reports.some((s) => ["Inflows", "Outflows", "Analysis"].includes(s)) &&
+    c.reports.some((s) => ["Inflows", "Outflows"].includes(s)) &&
     records.every((r) => r.amount == null)
   )
     throw Error(
       "The chosen Amount column has no valid numbers. Check its role and text number format.",
     );
+  if (c.reports.includes("Analysis"))
+    for (const g of c.groups) {
+      if (g.mode === "one" && g.values.length !== 1)
+        throw Error("Choose exactly one value for One value mode.");
+      if (g.mode === "selected" && !g.values.length)
+        throw Error("Choose at least one value for Selected values mode.");
+    }
   if (c.sort != null)
-    records.sort(
-      (a, b) =>
-        String(a.values[c.sort!] ?? "").localeCompare(
-          String(b.values[c.sort!] ?? ""),
-          undefined,
-          { numeric: true },
-        ) * (c.descending ? -1 : 1),
-    );
+    records.sort((a, b) => {
+      const index = c.sort!;
+      const x =
+        index === c.mapping.Date
+          ? a.day
+          : index === c.mapping.Amount
+            ? a.amount
+            : a.values[index];
+      const y =
+        index === c.mapping.Date
+          ? b.day
+          : index === c.mapping.Amount
+            ? b.amount
+            : b.values[index];
+      if (x == null) return y == null ? 0 : 1;
+      if (y == null) return -1;
+      return (
+        (typeof x === "number" && typeof y === "number"
+          ? x - y
+          : String(x).localeCompare(String(y), undefined, { numeric: true })) *
+        (c.descending ? -1 : 1)
+      );
+    });
   const unknownCurrencies = [
     ...new Set(
       records

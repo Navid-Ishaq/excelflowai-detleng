@@ -31,6 +31,13 @@ for (const width of [390, 768, 1440]) {
     ),
     false,
   );
+  const demo = await page
+    .locator(".hero-video .video-placeholder")
+    .boundingBox();
+  assert.ok(
+    demo && demo.y >= 0 && demo.y + demo.height < 900,
+    "Demo must be visible on first view",
+  );
   if (width === 390)
     await page.screenshot({ path: "work/home-mobile.png", fullPage: true });
 }
@@ -76,6 +83,7 @@ assert.equal(
 );
 await page.getByLabel("Date role", { exact: true }).selectOption("Date");
 await page.getByRole("button", { name: "Continue →", exact: true }).click();
+await page.getByRole("checkbox", { name: "Analysis", exact: true }).check();
 for (let i = 0; i < 2; i++)
   await page
     .getByRole("button", { name: "+ Add group analysis", exact: true })
@@ -88,6 +96,22 @@ await page
   .getByRole("combobox", { name: /Group By/ })
   .nth(1)
   .selectOption("7");
+const firstGroup = page.locator("fieldset").first();
+await firstGroup
+  .getByRole("combobox", { name: /Include values/ })
+  .selectOption("one");
+assert.ok((await firstGroup.getByRole("radio").count()) > 0);
+await firstGroup.getByRole("radio").first().check();
+await firstGroup
+  .getByRole("combobox", { name: /Include values/ })
+  .selectOption("selected");
+assert.ok((await firstGroup.getByRole("checkbox").count()) > 1);
+await firstGroup
+  .getByRole("button", { name: "Select all values", exact: true })
+  .click();
+await firstGroup
+  .getByRole("combobox", { name: /Include values/ })
+  .selectOption("all");
 await page.getByRole("button", { name: "Continue →", exact: true }).click();
 assert.match(await page.locator(".success").innerText(), /2,000 records/);
 await page.getByRole("button", { name: "Generate report →" }).click();

@@ -52,6 +52,7 @@ const source: Source = {
 };
 const config = (): Config => ({
   ...initialConfig(),
+  reports: ["Report Data", "Inflows", "Outflows", "Analysis"],
   selected: [0, 1, 2, 3, 4, 5],
   mapping: {
     Date: 0,

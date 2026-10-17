@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   type Source,
   type Dataset,
@@ -9,7 +9,8 @@ import {
   label,
   money,
 } from "./domain";
-import { suggest, prepare, kpis } from "./engine";
+import { GroupValues } from "./GroupValues";
+import { suggest, prepare, kpis, sourceColumns } from "./engine";
 type Props = {
   source: Source | null;
   config: Config;
@@ -19,6 +20,7 @@ type Props = {
   setStep: (n: number) => void;
   changeSheet: (s: string, d?: string) => Promise<void>;
   upload: () => void;
+  dropFile: (file: File) => void;
   generate: () => void;
   reset: () => void;
 };
@@ -31,12 +33,14 @@ export function Wizard({
   setStep,
   changeSheet,
   upload,
+  dropFile,
   generate,
   reset,
 }: Props) {
   const [error, setError] = useState(""),
     [manual, setManual] = useState<number[]>([]);
   const set = (v: Partial<Config>) => setConfig({ ...c, ...v });
+  const available = useMemo(() => (s ? sourceColumns(s) : []), [s]);
   const names = s?.rows[s.header]?.map(label) || [];
   const suggestions = s ? suggest(s, c) : null;
   let preview: Dataset | string | undefined;
@@ -51,6 +55,18 @@ export function Wizard({
     if (step === 2 && !c.selected.length) {
       setError("Choose at least one column.");
       return;
+    }
+    if (step === 2) {
+      const proposed = suggest(s, c).mapping;
+      const mapping = { ...c.mapping };
+      for (const role of roles)
+        if (
+          mapping[role] == null &&
+          proposed[role] != null &&
+          !manual.includes(proposed[role]!)
+        )
+          mapping[role] = proposed[role];
+      set({ mapping });
     }
     if (step === 3) {
       const values = Object.values(c.mapping);
@@ -120,9 +136,24 @@ export function Wizard({
           <>
             <h2>Bring your source file.</h2>
             <p>Choose an XLSX or UTF-8 CSV file. Maximum 20 MB.</p>
-            <button className="primary" onClick={upload}>
-              Choose file
-            </button>
+            <div
+              className="upload-dropzone"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "copy";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) dropFile(file);
+              }}
+            >
+              <strong>Drop your Excel or CSV file here</strong>
+              <p>Your file is processed locally in your browser.</p>
+              <button className="primary" onClick={upload}>
+                Choose file
+              </button>
+            </div>
           </>
         ) : (
           <>
@@ -173,7 +204,7 @@ export function Wizard({
                           recognized: false,
                         };
                         setSource(source);
-                        const selected = source.rows[h].map((_, i) => i);
+                        const selected = sourceColumns(source);
                         setConfig({
                           ...c,
                           selected,
@@ -211,15 +242,15 @@ export function Wizard({
                   <table>
                     <thead>
                       <tr>
-                        {names.map((n, i) => (
-                          <th key={i}>{n}</th>
+                        {available.map((i) => (
+                          <th key={i}>{names[i]}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {s.rows.slice(s.header + 1, s.header + 5).map((r, i) => (
+                      {s.rows.slice(s.header + 1, s.header + 21).map((r, i) => (
                         <tr key={i}>
-                          {names.map((_, j) => (
+                          {available.map((j) => (
                             <td key={j}>{String(r[j] ?? "")}</td>
                           ))}
                         </tr>
@@ -239,7 +270,7 @@ export function Wizard({
                 <div className="actions">
                   <button
                     className="secondary"
-                    onClick={() => set({ selected: names.map((_, i) => i) })}
+                    onClick={() => set({ selected: available })}
                   >
                     Select all
                   </button>
@@ -251,7 +282,7 @@ export function Wizard({
                   </button>
                 </div>
                 <div className="column-list">
-                  {names.map((n, i) => (
+                  {available.map((i) => (
                     <label className="check-row" key={i}>
                       <input
                         type="checkbox"
@@ -271,7 +302,7 @@ export function Wizard({
                         }}
                       />
                       <span>
-                        <b>{n}</b>
+                        <b>{names[i]}</b>
                         <small>
                           Column {i + 1} ·{" "}
                           {s.rows
@@ -431,136 +462,170 @@ export function Wizard({
                   for monetary analytics. Omitted source fields are available
                   only in this current session.
                 </p>
-                <h3>Group your data, your way.</h3>
-                <p>
-                  Add independent group reports. Each becomes a separate
-                  worksheet.
-                </p>
-                {c.groups.map((g, index) => (
-                  <fieldset key={index}>
-                    <legend>Group analysis {index + 1}</legend>
-                    <div className="two">
-                      <label>
-                        Group By
-                        <select
-                          value={g.column}
-                          onChange={(e) =>
-                            group(index, {
-                              column: Number(e.target.value),
-                              values: [],
-                            })
-                          }
-                        >
-                          {names.map((n, i) => (
-                            <option value={i} key={i}>
-                              {n} · column {i + 1}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label>
-                        Grouping level
-                        <select
-                          value={g.level}
-                          onChange={(e) =>
-                            group(index, {
-                              level: e.target.value as GroupConfig["level"],
-                              values: [],
-                            })
-                          }
-                        >
-                          <option value="value">Individual values</option>
-                          {["day", "week", "month", "quarter", "year"].map(
-                            (n) => (
-                              <option key={n}>{n}</option>
-                            ),
-                          )}
-                        </select>
-                      </label>
-                    </div>
+                {c.reports.includes("Analysis") && (
+                  <>
                     <label>
-                      Include values{" "}
-                      <small>Leave empty for all. One value per line.</small>
-                      <textarea
-                        value={g.values.join("\n")}
+                      Time summary
+                      <select
+                        value={c.timeGrouping || "auto"}
                         onChange={(e) =>
-                          group(index, {
-                            values: e.target.value.split("\n").filter(Boolean),
+                          set({
+                            timeGrouping: e.target
+                              .value as Config["timeGrouping"],
                           })
                         }
-                      />
+                      >
+                        {[
+                          "auto",
+                          "day",
+                          "week",
+                          "month",
+                          "quarter",
+                          "year",
+                        ].map((level) => (
+                          <option key={level}>{level}</option>
+                        ))}
+                      </select>
                     </label>
-                    <div className="two">
-                      <label>
-                        Sort groups
-                        <select
-                          value={g.sort}
-                          onChange={(e) =>
-                            group(index, {
-                              sort: e.target.value as GroupConfig["sort"],
+                    <h3>Group your data, your way.</h3>
+                    <p>
+                      Add independent group reports. Each becomes a separate
+                      worksheet.
+                    </p>
+                    {c.groups.map((g, index) => (
+                      <fieldset key={index}>
+                        <legend>Group analysis {index + 1}</legend>
+                        <div className="two">
+                          <label>
+                            Group By
+                            <select
+                              value={g.column}
+                              onChange={(e) =>
+                                group(index, {
+                                  column: Number(e.target.value),
+                                  level:
+                                    Number(e.target.value) === c.mapping.Date
+                                      ? "day"
+                                      : "value",
+                                  values: [],
+                                })
+                              }
+                            >
+                              {available.map((i) => (
+                                <option value={i} key={i}>
+                                  {names[i]} · column {i + 1}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            Grouping level
+                            <select
+                              value={g.level}
+                              onChange={(e) =>
+                                group(index, {
+                                  level: e.target.value as GroupConfig["level"],
+                                  values: [],
+                                })
+                              }
+                            >
+                              <option value="value">Individual values</option>
+                              {["day", "week", "month", "quarter", "year"].map(
+                                (n) => (
+                                  <option key={n}>{n}</option>
+                                ),
+                              )}
+                            </select>
+                          </label>
+                        </div>
+                        <GroupValues
+                          source={s}
+                          config={c}
+                          group={g}
+                          index={index}
+                          change={(v) => group(index, v)}
+                        />
+                        <div className="two">
+                          <label>
+                            Sort groups
+                            <select
+                              value={g.sort}
+                              onChange={(e) =>
+                                group(index, {
+                                  sort: e.target.value as GroupConfig["sort"],
+                                })
+                              }
+                            >
+                              <option value="label">Group value</option>
+                              <option value="inflow">Total inflows</option>
+                              <option value="outflow">Total outflows</option>
+                              <option value="net">Net flow</option>
+                              <option value="count">Transaction count</option>
+                            </select>
+                          </label>
+                          <label>
+                            Direction
+                            <select
+                              value={g.descending ? "desc" : "asc"}
+                              onChange={(e) =>
+                                group(index, {
+                                  descending: e.target.value === "desc",
+                                })
+                              }
+                            >
+                              <option value="asc">Ascending</option>
+                              <option value="desc">Descending</option>
+                            </select>
+                          </label>
+                        </div>
+                        <label className="check-row">
+                          <input
+                            type="checkbox"
+                            checked={g.chart}
+                            onChange={(e) =>
+                              group(index, { chart: e.target.checked })
+                            }
+                          />
+                          Include group chart when Analysis is selected
+                        </label>
+                        <button
+                          className="secondary"
+                          onClick={() =>
+                            set({
+                              groups: c.groups.filter((_, i) => i !== index),
                             })
                           }
                         >
-                          <option value="label">Group value</option>
-                          <option value="net">Net flow</option>
-                          <option value="count">Transaction count</option>
-                        </select>
-                      </label>
-                      <label>
-                        Direction
-                        <select
-                          value={g.descending ? "desc" : "asc"}
-                          onChange={(e) =>
-                            group(index, {
-                              descending: e.target.value === "desc",
-                            })
-                          }
-                        >
-                          <option value="asc">Ascending</option>
-                          <option value="desc">Descending</option>
-                        </select>
-                      </label>
-                    </div>
-                    <label className="check-row">
-                      <input
-                        type="checkbox"
-                        checked={g.chart}
-                        onChange={(e) =>
-                          group(index, { chart: e.target.checked })
-                        }
-                      />
-                      Include group chart when Analysis is selected
-                    </label>
+                          Remove this group
+                        </button>
+                      </fieldset>
+                    ))}
                     <button
                       className="secondary"
                       onClick={() =>
-                        set({ groups: c.groups.filter((_, i) => i !== index) })
+                        set({
+                          groups: [
+                            ...c.groups,
+                            {
+                              column: available[0],
+                              mode: "all",
+                              level:
+                                available[0] === c.mapping.Date
+                                  ? "day"
+                                  : "value",
+                              values: [],
+                              sort: "label",
+                              descending: false,
+                              chart: false,
+                            },
+                          ],
+                        })
                       }
                     >
-                      Remove this group
+                      + Add group analysis
                     </button>
-                  </fieldset>
-                ))}
-                <button
-                  className="secondary"
-                  onClick={() =>
-                    set({
-                      groups: [
-                        ...c.groups,
-                        {
-                          column: c.mapping.Category ?? 0,
-                          level: "value",
-                          values: [],
-                          sort: "label",
-                          descending: false,
-                          chart: true,
-                        },
-                      ],
-                    })
-                  }
-                >
-                  + Add group analysis
-                </button>
+                  </>
+                )}
               </>
             )}
             {step === 5 && (

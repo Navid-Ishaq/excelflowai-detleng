@@ -7,7 +7,7 @@ import {
   type AIResult,
   type Payload,
 } from "./domain";
-import { prepare, suggest, detectFormats } from "./engine";
+import { prepare, suggest, detectFormats, sourceColumns } from "./engine";
 import { renderText } from "./grounding";
 import { task, cancelTasks } from "./tasks";
 import { Wizard } from "./Wizard";
@@ -55,9 +55,11 @@ export function App() {
     [],
   );
   useEffect(() => {
-    document.getElementById("content")?.focus();
+    document.getElementById("content")?.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
   }, [view]);
   function reset() {
+    if (input.current) input.current.value = "";
     generation.current++;
     cancelTasks();
     urls.current.forEach(URL.revokeObjectURL);
@@ -77,8 +79,9 @@ export function App() {
   }
   function upload(explore = false) {
     mode.current = explore ? "explore" : "create";
-    input.current!.value = "";
-    input.current!.click();
+    setSource(null);
+    setStep(0);
+    setView("wizard");
   }
   async function read(file: File) {
     reset();
@@ -96,7 +99,7 @@ export function App() {
       setOriginal({ bytes, name: file.name });
       setSource(model);
       const c = { ...initialConfig(), ...detectFormats(model) };
-      c.selected = model.rows[model.header].map((_, i) => i);
+      c.selected = sourceColumns(model);
       c.mapping = suggest(model, c).mapping;
       setConfig(c);
       setStep(mode.current === "explore" ? 3 : 1);
@@ -131,7 +134,7 @@ export function App() {
       if (token !== generation.current) return;
       setSource(next);
       const c = { ...initialConfig(), ...detectFormats(next) };
-      c.selected = next.rows[next.header].map((_, i) => i);
+      c.selected = sourceColumns(next);
       c.mapping = suggest(next, c).mapping;
       setConfig(c);
     } catch (e) {
@@ -355,51 +358,24 @@ export function App() {
                       AI sharing
                     </p>
                   </div>
-                  <div
-                    className="hero-dashboard"
-                    aria-label="Illustrative dashboard with fictional figures"
-                  >
-                    <div className="mini-title">
-                      <span>YOUR BUSINESS, IN VIEW</span>
-                      <span className="pill">Fictional example</span>
+                  <aside className="hero-video" aria-label="Watch Demo">
+                    <span className="eyebrow">WATCH DEMO</span>
+                    <div className="video-placeholder">
+                      <span aria-hidden="true">▷</span>
+                      <b>Demo video coming soon</b>
+                      <small>A complete walkthrough will appear here.</small>
                     </div>
-                    <div className="mini-kpis">
-                      <div>
-                        <small>Money in</small>
-                        <b>24,800</b>
-                        <span>EUR</span>
-                      </div>
-                      <div>
-                        <small>Money out</small>
-                        <b>18,400</b>
-                        <span>EUR</span>
-                      </div>
-                      <div>
-                        <small>Net flow</small>
-                        <b className="positive">6,400</b>
-                        <span>EUR</span>
-                      </div>
-                    </div>
-                    <div className="demo-bars" aria-hidden="true">
-                      {[40, 64, 46, 82, 62, 96, 74, 100, 82, 90].map((v, i) => (
-                        <div key={i}>
-                          <i style={{ height: v + "%" }} />
-                          <i style={{ height: v * 0.7 + "%" }} />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mini-title">
-                      <span>REPORT → EXPLORE → UNDERSTAND</span>
-                      <span>✦</span>
-                    </div>
-                    <div className="insight-demo">
-                      <b>Clarity before complexity.</b>
-                      <p>
-                        Checked calculations first. Optional AI explanations
-                        second.
-                      </p>
-                    </div>
-                  </div>
+                    <p>
+                      Build, create and explore. AI insights powered by OpenAI
+                      and orchestrated with Mastra.
+                    </p>
+                    <button
+                      className="secondary"
+                      onClick={() => setModal("guide")}
+                    >
+                      Open Quick Guide
+                    </button>
+                  </aside>
                 </section>
                 <section
                   className="entry-grid"
@@ -441,7 +417,7 @@ export function App() {
                     </article>
                   ))}
                 </section>
-                <section className="how">
+                <section className="how" id="how">
                   <span className="eyebrow">
                     A SIMPLE ROUTE TO BETTER REPORTING
                   </span>
@@ -456,30 +432,9 @@ export function App() {
                       group reports and interactive charts.
                     </p>
                     <p>
-                      <b>03 / Ask with confidence</b>Request optional AI
-                      explanations grounded in checked metrics.
+                      <b>03 / Ask with confidence</b>Request AI explanations
+                      grounded in checked metrics.
                     </p>
-                  </div>
-                </section>
-                <section className="demo-section">
-                  <div>
-                    <span className="eyebrow">SEE IT IN ACTION</span>
-                    <h2>A guided look, coming soon.</h2>
-                    <p>
-                      Our demo video will show the complete journey. Until then,
-                      try the sample or take the interactive Quick Guide.
-                    </p>
-                    <button
-                      className="secondary"
-                      onClick={() => setModal("guide")}
-                    >
-                      Open Quick Guide
-                    </button>
-                  </div>
-                  <div className="video-placeholder">
-                    <span>▷</span>
-                    <b>Demo video coming soon</b>
-                    <small>No video has been published yet.</small>
                   </div>
                 </section>
               </>
@@ -493,7 +448,11 @@ export function App() {
                 step={step}
                 setStep={setStep}
                 changeSheet={changeSheet}
-                upload={() => upload()}
+                upload={() => {
+                  input.current!.value = "";
+                  input.current!.click();
+                }}
+                dropFile={(file) => void read(file)}
                 generate={() => void generate()}
                 reset={reset}
               />
@@ -668,22 +627,57 @@ export function App() {
           </>
         )}
       </main>
-      <footer className="shell">
+      <footer className="shell product-footer">
         <div>
           <b>
             ExcelFlow AI <span>by DeTLeng</span>
           </b>
-          <p>Clear reports. Considered decisions.</p>
+          <p>Business data in. Clear reports out.</p>
+          <p>
+            Turn spreadsheet records into useful reports and grounded AI
+            insights.
+          </p>
         </div>
         <div>
+          <b>ExcelFlow AI</b>
+          <button
+            onClick={() => {
+              reset();
+              setTimeout(
+                () => document.getElementById("how")?.scrollIntoView(),
+                0,
+              );
+            }}
+          >
+            How it works
+          </button>
+          <button onClick={() => upload()}>Start Report</button>
           <button onClick={() => setModal("privacy")}>Privacy</button>
-          <button onClick={() => setModal("guide")}>Quick Guide</button>
           <button onClick={() => setModal("about")}>About</button>
+          <button onClick={() => setModal("story")}>Behind ExcelFlow AI</button>
+          <button onClick={() => setModal("guide")}>Quick Guide</button>
         </div>
-        <small>
-          Spreadsheet calculations are local. Optional AI uses selected context
-          remotely.
-        </small>
+        <div>
+          <b>AI workflow</b>
+          <p>
+            OpenAI insights
+            <br />
+            Mastra orchestration
+            <br />
+            Checked metric references
+          </p>
+        </div>
+        <div>
+          <b>Made with care</b>
+          <p>
+            Browser processing
+            <br />
+            Original file untouched
+            <br />
+            AI context shared with your consent
+          </p>
+          <p>OpenAI · Mastra</p>
+        </div>
       </footer>
       {modal && (
         <Modal
@@ -709,11 +703,11 @@ export function App() {
                 your records or conversations to browser storage.
               </p>
               <p>
-                AI is optional. When you explicitly request insights or send a
-                question, checked summaries, group labels and a limited set of
-                relevant row references, dates and amounts are sent to our AI
-                backend and OpenAI. The request preview shows this context. Your
-                full workbook is not uploaded by default.
+                When you explicitly request insights or send a question, checked
+                summaries, group labels and a limited set of relevant row
+                references, dates and amounts are sent to our AI backend and
+                OpenAI. The request preview shows this context. Your full
+                workbook is not uploaded by default.
               </p>
               <p>
                 The application has no user database or permanent workbook/chat
@@ -734,10 +728,9 @@ export function App() {
                 for spreadsheet reporting and evidence-based decision support.
               </p>
               <p>
-                Build a workbook, create a report, explore trends, and
-                optionally ask an AI assistant to explain checked results. This
-                is reporting support, not an accounting system or financial
-                advice.
+                Build a workbook, create a report, explore trends, and ask an AI
+                assistant to explain checked results. This is reporting support,
+                not an accounting system or financial advice.
               </p>
               <p>
                 Supported input: XLSX and UTF-8 CSV, up to 20 MB, 200,000

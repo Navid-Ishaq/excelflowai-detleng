@@ -1,6 +1,6 @@
 # ExcelFlow AI by DeTLeng
 
-An independent portfolio application for local spreadsheet reporting, interactive analytics and optional evidence-grounded AI assistance. Domain: `excelflowai.detleng.com`. New implementation created on 16 October 2026.
+An independent portfolio application for local spreadsheet reporting, interactive analytics and evidence-grounded AI assistance with OpenAI and Mastra. Domain: `excelflowai.detleng.com`. New implementation created on 16 October 2026.
 
 ## Run locally
 
@@ -41,7 +41,7 @@ Browser tests use local Chrome on Windows (see `tests/browser.ts`); `EF_BASE_URL
 
 ## Privacy and limits
 
-Spreadsheet import, calculations, grouping, charts, Excel creation and PDF rendering run in the browser. Application data stays in active memory, with no localStorage/sessionStorage/database persistence. Optional AI sends the displayed compact context, the current question and bounded recent conversation to the backend and OpenAI. Provider policies still apply; no zero-retention claim is made. No workbook/chat contents are logged by application code. Start New Report aborts processing and clears active state/download links; previously downloaded files remain on the device.
+Spreadsheet import, calculations, grouping, charts, Excel creation and PDF rendering run in the browser. Application data stays in active memory, with no localStorage/sessionStorage/database persistence. AI sends the displayed compact context, the current question and bounded recent conversation to the backend and OpenAI. Provider policies still apply; no zero-retention claim is made. No workbook/chat contents are logged by application code. Start New Report aborts processing and clears active state/download links; previously downloaded files remain on the device.
 
 Supported inputs: unencrypted XLSX and UTF-8 CSV, 20 MB, 200,000 records, 256 columns; expanded XLSX is limited to 200 MB and 4,000 ZIP entries. Actual capacity depends on device memory and workbook complexity. No legacy XLS, macro execution, arbitrary formula evaluation or FX conversion. Cached formula results are read; uncached formulas become missing values. Header detection inspects a bounded preamble and remains editable. Source footer totals should be removed before import. CSV must be structurally consistent; ambiguous delimiters/locales require review. Native numeric values are not locale-transformed; text conventions are explicit. Arithmetic uses JavaScript numbers with compensated summation and bounded rounding, not arbitrary-precision accounting.
 

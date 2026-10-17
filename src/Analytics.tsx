@@ -813,9 +813,8 @@ export function Analytics({
             <span className="eyebrow">EVIDENCE BEFORE EXPLANATION</span>
             <h2>Ask better questions.</h2>
             <p>
-              Optional AI uses checked summaries and selected evidence remotely.
-              No full workbook upload. Local reports work even when AI is
-              unavailable.
+              AI uses checked summaries and selected evidence remotely. No full
+              workbook upload. Local reports work even when AI is unavailable.
             </p>
             <label>
               Response language
