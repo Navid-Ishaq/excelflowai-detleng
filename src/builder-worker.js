@@ -1,0 +1,2 @@
+import {buildWorkbook} from './builder-output.js';
+self.onmessage=async({data:m})=>{try{const result=await buildWorkbook(m.definition,m.mode,{progress:stage=>self.postMessage({type:'progress',stage})});self.postMessage({type:'builder-result',...result},[result.buffer.buffer||result.buffer]);}catch(e){self.postMessage({type:'error',message:e.message||'Workbook generation failed. Try fewer rows or columns.'});}};

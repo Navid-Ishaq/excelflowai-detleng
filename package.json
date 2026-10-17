@@ -5,35 +5,26 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5180",
-    "server": "tsx --env-file-if-exists=.env server/index.ts",
-    "build": "tsc --noEmit && vite build",
+    "build": "vite build",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node tests/browser.mjs && node tests/extra-browser.mjs && node tests/analysis-browser.mjs",
+    "test:live": "node tests/live-browser.mjs && node tests/live-edge-browser.mjs",
+    "test:performance": "node tests/live-performance.mjs",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "tsx --test tests/*.test.ts",
-    "test:e2e": "tsx tests/browser.ts",
-    "check": "tsc --noEmit",
-    "test:reset": "tsx tests/reset-browser.ts",
-    "format:check": "prettier --check src server tests index.html vite.config.ts"
+    "test:builder": "node tests/builder-browser.mjs",
+    "test:experiences": "node tests/guide-browser.mjs && node tests/story-browser.mjs",
+    "test:roles": "node tests/roles-browser.mjs",
+    "check": "node --check src/app.js",
+    "test:e2e": "npm run test:browser && npm run test:live && npm run test:builder && npm run test:experiences && npm run test:roles"
   },
   "dependencies": {
-    "@mastra/core": "1.78.0",
     "chart.js": "4.5.1",
     "exceljs": "4.4.0",
-    "jspdf": "4.2.1",
-    "jszip": "3.10.1",
-    "papaparse": "5.7.0",
-    "react": "19.3.1",
-    "react-dom": "19.3.1",
-    "zod": "4.6.7"
+    "jszip": "3.10.1"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "@types/node": "24.19.2",
-    "@types/papaparse": "5.5.2",
-    "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
     "axe-core": "4.14.0",
-    "prettier": "3.9.10",
-    "tsx": "4.23.15",
     "typescript": "5.9.3",
     "vite": "7.3.7"
   },

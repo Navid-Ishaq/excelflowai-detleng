@@ -1,6 +1,2 @@
-import { defineConfig } from "vite";
-export default defineConfig({
-  base: "./",
-  server: { proxy: { "/api": "http://127.0.0.1:8787" } },
-  build: { target: "es2022" },
-});
+import {defineConfig} from "vite";
+export default defineConfig({base:"./",server:{host:"127.0.0.1"},build:{target:"es2022"}});
