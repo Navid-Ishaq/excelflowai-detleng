@@ -1,3 +1,13 @@
+# PDF, language and conversation UX update — 18 October 2026
+
+Implemented the agreed button names, per-answer and combined PDF actions, a local calculated overview PDF before any AI query, ten language presets plus custom language names, short-answer presentation, visible progress/timing/cancel, auto-scroll to results and return-to-question focus. Existing spreadsheet engines and Excel/chart exports remain unchanged. PDF buttons open the browser's print dialog; choose Save as PDF. No extra AI request is made for exports.
+
+Verification: 49 foundation tests and 11 AI tests passed; frontend build, backend type checks, Create/validation/analysis, Live Analytics/edge cases, Guide and AI browser journeys passed. AI browser coverage includes no transfer before consent, PDF scopes, custom language request payload, compact supporting evidence, timer/cancel, scroll/focus, session recovery, existing Excel export and mobile/axe. Three actual native PDFs were produced: single Urdu, combined Urdu/Hindi/Bengali/Arabic/Chinese, and calculated overview. Their 1/5/2 pages were rendered with PDFium and visually inspected for readable shaping, RTL, clipping and pagination. These are fictional layout/transport fixtures, not live model responses.
+
+The owner reported successful live AI tests before this update. This local update does not claim a new live-provider test or deployment. Push and deploy both Pages and the Render backend, then check actual answer language and short-answer behavior with the existing key. No new configuration variables are needed.
+
+---
+
 # AI integration verification — 18 October 2026
 
 ## Implemented locally

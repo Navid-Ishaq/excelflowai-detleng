@@ -20,7 +20,8 @@
     "start:server": "tsx server/index.ts",
     "check:server": "tsc -p tsconfig.server.json",
     "test:ai": "tsx --test tests/ai*.test.ts",
-    "test:ai:browser": "node tests/ai-browser.mjs"
+    "test:ai:browser": "node tests/ai-browser.mjs",
+    "test:ai:pdf": "node tests/ai-pdf-browser.mjs"
   },
   "dependencies": {
     "@mastra/core": "1.78.0",

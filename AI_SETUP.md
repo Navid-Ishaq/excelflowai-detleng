@@ -6,7 +6,7 @@ The reporting foundation remains intact. The new Node/TypeScript API hosts the r
 
 Use Node.js 24. Run `npm ci`. Copy `.env.example` to `.env`, set `OPENAI_API_KEY` locally, and keep it out of version control. Never paste API keys into chat. Run `npm run dev:server` in one terminal and `npm run dev` in another. The browser is at http://127.0.0.1:5180 and the backend is at http://127.0.0.1:8787. Other browser ports require an exact matching entry in ALLOWED_ORIGINS.
 
-Build or upload a source workbook, generate a report, and select Open AI Analyst. Explore Existing Report also exposes the analyst from Live Analytics. Existing reports do not include the original source automatically: add it in the analyst if required. Review the full-data access notice and authorize connection. Connect & run deep investigation performs the default investigation; a question can also connect and run on its own. There are no fabricated fallback answers when configuration or the provider is unavailable.
+Build or upload a source workbook, generate a report, and select Ask AI About Your Data. Explore Existing Report also exposes the analyst from Live Analytics. Existing reports do not include the original source automatically: add it in the analyst if required. Review the full-data access notice and authorize connection. Connect & run deep investigation performs the default investigation; a question can also connect and run on its own. There are no fabricated fallback answers when configuration or the provider is unavailable.
 
 ## Render configuration
 
@@ -48,3 +48,9 @@ The current npm audit reports five moderate transitive findings along Mastra's g
 ## References
 
 [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling), [Mastra tools](https://mastra.ai/docs/agents/tools), [Mastra Platform](https://mastra.ai/docs/mastra-platform/overview), [Render Blueprint reference](https://render.com/docs/blueprint-spec), [Render environment variables](https://render.com/docs/configure-environment-variables).
+
+## Deploying the PDF/language/UX update
+
+Push both frontend and server changes. Existing GitHub Actions rebuilds Pages and Render should redeploy the linked branch; if auto-deploy is disabled, deploy the latest commit manually in Render. No new environment variable, API key or hosting service is required. The backend update expands language validation and adds responseStyle; deploy it as well as the frontend before testing new/custom languages. Existing keys and VITE_AI_URL remain unchanged.
+
+PDF buttons open a native print dialog where the user selects Save as PDF. They export saved answer text locally; no extra AI call or backend PDF service is used. The overall business overview is calculated in English and explicitly distinguished from AI findings. Per-answer/combined PDFs keep the original response languages. Output fonts depend on the device's available fonts; Urdu, Arabic, Hindi, Bengali and Chinese layouts were rendered and visually checked on Windows Chrome. Real translation quality in every language is not certified by layout fixtures.
