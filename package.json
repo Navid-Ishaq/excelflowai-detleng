@@ -21,7 +21,8 @@
     "check:server": "tsc -p tsconfig.server.json",
     "test:ai": "tsx --test tests/ai*.test.ts",
     "test:ai:browser": "node tests/ai-browser.mjs",
-    "test:ai:pdf": "node tests/ai-pdf-browser.mjs"
+    "test:ai:pdf": "node tests/ai-pdf-browser.mjs",
+    "test:technical-guide": "node tests/technical-guide-browser.mjs"
   },
   "dependencies": {
     "@mastra/core": "1.78.0",

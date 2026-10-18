@@ -31,3 +31,7 @@ Ask AI About Your Data opens the workspace; Ask AI sends a question. Each comple
 Choose English, Spanish, German, French, Portuguese, Arabic, Urdu, Hindi, Bengali or Chinese, or Other to type a language such as Roman Urdu. Each query captures its chosen language; existing answers are unchanged. Custom language support and model translation quality are best effort. Short/one-paragraph requests keep supporting findings collapsed while retaining inspectable evidence. Progress shows elapsed seconds, Cancel and a response-time notice; results scroll into view automatically.
 
 `npm run test:ai:pdf` renders three native PDF layout fixtures (single, combined multilingual, calculated overview) into ignored work/pdf-ux. These are layout samples, not live model results.
+
+## Technical walkthrough
+
+Open **Technical Guide** from the website navigation or footer for a chapter-based architecture, processing, Mastra/OpenAI tool-loop, evidence, deployment and verification walkthrough. [TECHNICAL_GUIDE.md](TECHNICAL_GUIDE.md) is the repository companion. The guide describes code and defaults, distinguishes Platform observability from Render execution, and explains how to verify real-provider behavior separately from fixture tests.

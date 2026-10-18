@@ -93,10 +93,12 @@ const informationActions={build:startBuilder,create:start,explore:startExisting,
 async function openInformation(kind){
  if(informationOpen)return;informationOpen=true;
  try{
-  const module=await import('./guide-view.js');
+  const module=kind==='technical'?await import('./technical-view.js'):await import('./guide-view.js');
   module.openGuide(informationActions,()=>informationOpen=false);
  }catch(e){informationOpen=false;console.error(e);}
 }
 document.querySelectorAll('.quick-guide').forEach(button=>button.addEventListener('click',()=>openInformation('guide')));
 
 window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
+
+document.querySelectorAll('.technical-guide-entry').forEach(button=>button.addEventListener('click',()=>{closeMenu();openInformation('technical');}));
