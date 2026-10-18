@@ -8,3 +8,14 @@ body.experience-open{overflow:hidden}.experience{width:calc(100% - 24px);height:
 .experience p{color:#4d655c}
 
 .story-reveal,.story-timeline{scroll-margin-top:140px}
+
+/* Beginner guide: readable steps, direct chapter navigation, and compact help. */
+.experience .guide-jump{display:block;margin:18px 0 0;font-weight:650;max-width:100%}
+.experience .guide-jump select{width:100%;margin-top:8px;min-width:0;white-space:normal}
+.experience .guide-steps{padding:0;list-style:none;counter-reset:guide-step;display:grid;gap:14px;margin:24px 0}
+.experience .guide-steps>li{counter-increment:guide-step;position:relative;border:1px solid var(--line);border-radius:16px;background:#fff;padding:20px 24px 20px 70px;overflow-wrap:anywhere}
+.experience .guide-steps>li::before{content:counter(guide-step);position:absolute;left:20px;top:20px;width:32px;height:32px;display:grid;place-items:center;background:#eeedff;color:#3325a4;border-radius:50%;font-weight:750}
+.experience .guide-steps h3{font-size:20px;margin:0 0 8px}.experience .guide-steps p,.experience .guide-note p{margin:0;line-height:1.75}
+.experience .guide-note{border:1px solid var(--line);border-left:4px solid #5141d8;background:#f3f2ff;padding:20px 24px;border-radius:12px;margin:20px 0;overflow-wrap:anywhere}
+.experience .guide-note>strong{display:block;margin-bottom:8px}.experience .guide-faq details{border-bottom:1px solid var(--line);padding:10px 0}.experience .guide-faq p{padding:0 8px 10px;line-height:1.75}
+@media(max-width:760px){.experience .guide-steps>li{padding:18px 16px 18px 58px}.experience .guide-steps>li::before{left:14px;top:18px;width:28px;height:28px}.experience .guide-note{padding:18px}.experience .guide-jump select{font-size:14px}.experience .guide-steps h3{font-size:18px}}

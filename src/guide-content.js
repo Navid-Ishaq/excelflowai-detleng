@@ -1,16 +1,21 @@
 export const HELP={amount:'Positive values become inflows. Negative values become outflows. Zero stays in Report Data only.',group:'Choose the field you want to compare. Analyze all values, one value, or selected values.',live:'Explore KPIs, trends, groups and transactions interactively.'};
 export const SCENES={
- welcome:['Welcome to ExcelFlow AI','Understand the whole workflow in under 3 minutes.'],
+ welcome:['Welcome to ExcelFlow AI','Choose your starting point, follow the steps, or jump directly to a topic.'],
  build:['No workbook yet? Start here.','Choose a workbook type, columns and settings. Then choose your beginning.'],
  create:['Your columns. Your meaning.','Upload Excel, choose the useful records, and tell ExcelFlow AI what the important columns mean.'],
  report:['A workbook you can understand.','Click a sheet to see what it contains. Only your selected reports are generated.'],
  live:['Ask a question. See the picture change.','Try these fictional filters. This is an illustrative sample, separate from your business data.'],
  return:['Welcome back to your report.','A downloaded ExcelFlow AI workbook can return to the same Live Analytics experience.'],
  ai:['Meet your AI Analyst.','After your report is ready, investigate the full supplied dataset with OpenAI and Mastra.'],
+ questions:['Ask useful questions.','Choose a suggested question or describe what you want to understand.'],
+ languages:['Your data. Your answer language.','Choose the language before sending your next question.'],
+ downloads:['Keep the results you need.','Choose the right Excel or PDF export before leaving the page.'],
+ sample:['Try the complete journey.','Practice with a fictional workbook before using your own data.'],
+ help:['Something does not look right?','Check these common situations before starting over.'],
  privacy:['Understand your data access.','Reports are local. Connecting AI shares supplied data after authorization. Your original file remains untouched.'],
  ready:['Build. Create. Analyze. Explore.','Business data in. Clear understanding out.']
 };
-export const JOURNEYS={all:['welcome','build','create','report','live','return','ai','privacy','ready'],build:['build','create','report','live','return','ai','privacy','ready'],create:['create','report','live','return','ai','privacy','ready'],explore:['return','live','ai','privacy','ready']};
+export const JOURNEYS={all:['welcome','build','create','report','live','return','ai','questions','languages','downloads','sample','help','privacy','ready'],build:['build','create','report','live','return','ai','questions','languages','downloads','sample','help','privacy','ready'],create:['create','report','live','return','ai','questions','languages','downloads','sample','help','privacy','ready'],explore:['return','live','ai','questions','languages','downloads','sample','help','privacy','ready']};
 export const SHEETS={
  'Report Data':'Your selected detailed records, including zero amounts.',
  'Inflows':'Transactions where Amount is greater than zero.',

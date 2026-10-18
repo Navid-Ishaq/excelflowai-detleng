@@ -13,3 +13,5 @@ body .explore-entry,body .build-entry{background:#fff}
 body .guide-entry,body .live-date-kpis>div,body .live-insights article,body .builder-structure,body .builder-output-grid article,body .experience-twins>div,body .experience-kpis>div{background:#eef0fc}
 body .builder-template:has(input:checked){background:#f0efff;border-color:var(--teal)}
 body .story-turn{background:linear-gradient(135deg,#eeedff,#f6f7ff)}
+
+.sample-entry{margin-top:20px}.sample-entry p{font-size:14px;margin:8px 0;color:var(--muted)}.sample-entry #sample-status:empty{display:none}.sample-entry #sample-status{color:var(--ink)}

@@ -34,3 +34,12 @@ No live OpenAI inference, Render deployment or Mastra Platform trace delivery wa
 Anonymous demo-service controls include ephemeral bearer sessions, rate/body/concurrency limits, model/tool/time bounds and a process-local daily request cap. These do not replace durable public-production abuse controls or a provider spending budget. Five moderate npm dependency advisories remain in an upstream Mastra front-matter dependency chain; see AI_SETUP.md. They were not hidden by a breaking downgrade.
 
 No commit, push, publication or account configuration was performed by this local implementation.
+
+
+## Quick Guide update — 18 October 2026
+
+Expanded the informational guide into 14 chapters with numbered beginner instructions, journey selection and direct topic navigation. Covers workbook building, source/header/column/role review, reports and periods, Live Analytics, reopening, full-data AI authorization, questions and follow-ups, answer languages, all three PDF scopes, updated Excel findings, temporary sessions and troubleshooting. Includes the downloadable fictional Movimientos practice journey.
+
+Validation: production build and Quick Guide browser suite passed. Browser checks cover focused/full journeys, interactive examples, chapter jumps, sample workbook availability, mobile overflow, serious/critical axe accessibility findings, reduced motion, actual Builder state preservation and no AI session/question requests from guide interactions. New chapters checked at 390px; existing responsive checks run at 1440/1024/768/390px. Mobile screenshot visually reviewed. No reporting engine, AI backend, account configuration or deployment changed in this update.
+
+Homepage sample shortcut: Try with Sample Data loads the bundled fictional workbook into the existing source reporting flow. Quick Guide describes direct loading and manual upload. Production build, guide browser suite and tests/sample-browser.mjs passed, including fetch failure/retry, Movimientos/header 1, suggested Date/Amount/Currency roles, 60-record report generation, original source retained for AI, no automatic authorization/data POST, and mobile overflow.

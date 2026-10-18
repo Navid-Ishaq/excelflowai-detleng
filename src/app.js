@@ -46,6 +46,21 @@ const error=m=>{$('error').textContent=m;if(file&&step===0){const retry=document
 function handleWorkerMessage({data:m}){if(m.type==='error'){finishLoading();render();error(m.message);}if(m.type==='loaded'){sheets=m.sheets;finishLoading();if(!sheets.length){error('No worksheets found. Choose another workbook.');return;}step=1;render();loadSheet(sheets[0]);}if(m.type==='model'){roleSuggestions=null;model=m.model;const restoredColumns=model.columns;model.columns=columns(model.rows,model.header).map(c=>({...c,...restoredColumns?.find(x=>x.id===c.id)}));config.selected=model.columns.map(c=>c.id);config.roles={};config.groups=[];config.period='all';config.sort=null;if(model.builder)restoreBuilderRoles();finishLoading();render();}if(m.type==='progress'){loadingStage=m.stage;if($('stage'))$('stage').textContent=m.stage;}if(m.type==='result'){resetAI();finishLoading();result=m.data;if(blobUrl)URL.revokeObjectURL(blobUrl);blobUrl=URL.createObjectURL(new Blob([m.buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));renderResult();}};
 function loadSheet(name){beginLoading('Inspecting your source worksheet…');worker.send({type:'sheet',name});}
 function start(){hideOtherViews(); $('landing').hidden=true;$('workspace').hidden=false;render();$('workspace').scrollIntoView();}
+async function trySample(){
+ const button=$('try-sample'),status=$('sample-status');
+ if(button.disabled)return;
+ button.disabled=true;status.textContent='Loading fictional sample workbook…';
+ try{
+  const response=await fetch(import.meta.env.BASE_URL+'examples/fictional-side-hustle.xlsx');
+  if(!response.ok)throw Error('Sample workbook unavailable');
+  const sample=new File([await response.arrayBuffer()],'fictional-side-hustle.xlsx',{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  Object.assign(config,{timeGrouping:'auto',groups:[],selected:[],roles:{},period:'all',start:'',end:'',sort:null,direction:'asc',numberStyle:'dot',dateOrder:'dmy',reports:['Report Data','Inflows','Outflows']});
+  start();upload(sample);status.textContent='';
+ }catch{
+  status.textContent='The sample could not be loaded. Please try again, or upload your own .xlsx workbook.';
+ }finally{button.disabled=false;}
+}
+$('try-sample').onclick=trySample;
 function upload(f){if(!f)return;resetAI();builderRaw=null;roleSuggestions=null;if(!/\.xlsx$/i.test(f.name)){error('Unsupported file. Please choose an .xlsx workbook.');return;}if(f.size>20*1024*1024){error('Please choose a workbook smaller than 20 MB.');return;}worker.cancel();result=null;if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}const sequence=++uploadSequence;file=f;step=0;model=null;sheets=[];config.sheet=undefined;beginLoading('Reading your file from this device…');f.arrayBuffer().then(buffer=>{if(sequence!==uploadSequence)return;loadingStage='Opening workbook locally…';if($('stage'))$('stage').textContent=loadingStage;worker.send({type:'load',buffer},[buffer]);}).catch(()=>{if(sequence===uploadSequence)resetProcessing('The file could not be read. Try selecting it again.');});}
 const options=(list,current)=>list.map(([value,label])=>`<option value="${esc(value)}" ${String(value)===String(current)?'selected':''}>${esc(label)}</option>`).join('');
 function table(rows,ids=config.selected){return `<div class="table-wrap" tabindex="0" aria-label="Scrollable record preview"><table><thead><tr>${ids.map(id=>`<th>${esc(model.columns.find(c=>c.id===id)?.label)}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,20).map(r=>`<tr>${ids.map(id=>`<td>${esc(fmt(r[id]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="help">Preview limited to 20 rows for performance. Download includes all matching records.</p>`;}
