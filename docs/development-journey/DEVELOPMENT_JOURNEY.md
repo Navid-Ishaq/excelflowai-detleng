@@ -251,3 +251,13 @@ The most important work was collaborative. The owner understood the recurring re
 **Future maintenance:** Replace or edit only this Markdown file, follow `MAINTENANCE_GUIDE.txt` in the same folder, and push the change. The existing GitHub Actions build includes the current document automatically. No separate database, CMS, server endpoint or manual JavaScript edit is needed for a normal content update.
 
 **Scope:** This documentation change does not modify workbook calculations, reporting, Live Analytics, the Mastra agent or the AI backend. The update is source-level work; deployment and live acceptance are completed when the owner pushes and checks the public website.
+
+## Development update — 5 November 2026, 02:28 CET: Persistent chapter navigation
+
+**User feedback:** While reading the How to Build documentation, the chapter list on the left moved out of view as the main document scrolled. This made it hard to see the current chapter or jump to another section without returning to the top. The owner requested a persistent left navigation panel, with the chapter being read highlighted automatically.
+
+**What changed:** The desktop chapter sidebar now stays visible while the document scrolls. Its title and chapter search remain in place, while the list of chapters scrolls independently inside the sidebar. As the reader moves through the right-hand document, the corresponding chapter is highlighted and, when necessary, brought into view **inside the left chapter list only**. Clicking a chapter still moves the document to that section. On narrow mobile screens, the existing compact chapter selector remains available.
+
+**Files changed:** `src/how-to-build.css` (sticky layout and independent chapter-list scrolling), `src/how-to-build-view.js` (active-chapter tracking and sidebar-only auto-scroll), `tests/how-to-build.test.js` (navigation regression checks), and this Markdown development log. The maintenance guide in this folder also explains the intended behaviour.
+
+**Verification:** JavaScript syntax and Markdown reader checks were run against the updated files. This note records the source update, not a claim that the owner's Windows folder or deployed website has already been modified. The owner can place the patch in the repository, run the project build and push it to publish the change.

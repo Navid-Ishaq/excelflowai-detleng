@@ -66,3 +66,13 @@ src/how-to-build.css                            presentation
 tests/how-to-build.test.js                      non-browser rendering tests
 index.html                                      navigation entries
 src/app.js                                      open/close wiring
+
+Chapter navigation behaviour — 5 November 2026
+----------------------------------------------
+On desktop, the left How to Build chapter navigator is sticky while the
+main document scrolls. Its search and heading stay visible; only the
+chapter link list scrolls internally. The active chapter is highlighted
+as the reader scrolls the main document and automatically moved into the
+visible part of the chapter list when necessary. On mobile, the compact
+chapter dropdown is used instead. Content-only Markdown replacements
+need no JavaScript or CSS changes.

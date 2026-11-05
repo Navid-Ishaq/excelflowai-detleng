@@ -11,16 +11,23 @@
 .journey-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
 .journey-tags span{border-radius:100px;border:1px solid #dce2f1;background:#fff;padding:8px 13px;color:#48577a;font-size:12px;font-weight:650}
 .journey-layout{display:grid;grid-template-columns:minmax(250px,290px) minmax(0,1fr);gap:clamp(20px,4vw,60px);max-width:1390px;margin:auto;padding:34px clamp(20px,4vw,64px) 70px;align-items:start}
-.journey-sidebar-inner{position:sticky;top:90px;max-height:calc(100dvh - 140px);overflow-y:auto;padding:23px 16px 23px 20px;background:#fff;border:1px solid #e1e6f2;border-radius:18px;box-shadow:0 15px 45px #15264a0b}
+/* Keep the chapter navigator in view while the document itself scrolls.
+   The grid item is sticky (not its short inner child), so the sticky boundary
+   is the whole long documentation row. Only the chapter list scrolls inside. */
+.journey-sidebar{position:sticky;top:94px;align-self:start;min-width:0}
+.journey-sidebar-inner{box-sizing:border-box;display:flex;flex-direction:column;min-height:0;max-height:calc(100dvh - 140px);overflow:hidden;padding:23px 16px 23px 20px;background:#fff;border:1px solid #e1e6f2;border-radius:18px;box-shadow:0 15px 45px #15264a0b}
+.journey-sidebar-title,.journey-search-label,.journey-sidebar input,.journey-source,.journey-empty{flex-shrink:0}
 .journey-sidebar-title{display:flex;justify-content:space-between;gap:8px;font-size:15px;font-weight:800;color:#192540;margin-bottom:14px}
 .journey-sidebar-title span{font-size:12px;color:#7b86a1;font-weight:600}
 .journey-search-label{display:block;margin-bottom:6px;font-size:12px;font-weight:650;color:#526078}
 .journey-sidebar input{width:100%;min-width:0;padding:12px 13px;border:1px solid #ccd6e9;border-radius:10px;background:#f8f9fd;font:inherit;font-size:14px}
-.journey-chapters{display:grid;gap:2px;margin-top:18px}
+/* Keep search/title visible, and scroll the chapter links within this pane. */
+.journey-chapters{display:grid;align-content:start;gap:2px;margin-top:18px;min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:4px}
 .journey-chapters a{display:flex;gap:10px;align-items:start;padding:10px 9px;color:#43516d;text-decoration:none;font-size:13px;font-weight:550;line-height:1.45;border-radius:9px;overflow-wrap:anywhere}
 .journey-chapters a[hidden]{display:none}
 .journey-chapters a span{font-size:11px;font-weight:750;color:#756baf;min-width:22px;padding-top:2px}
 .journey-chapters a:hover,.journey-chapters a[aria-current]{background:#edeafe;color:#3929bd}
+.journey-chapters a[aria-current="location"]{font-weight:750;box-shadow:inset 3px 0 #5b47e0}
 .journey-empty{font-size:13px;margin:14px 8px;color:#6c7484}
 .journey-source{display:block;margin-top:18px;padding:14px 8px 2px;border-top:1px solid #e1e6f2;color:#4435c8;font-size:13px;font-weight:700;overflow-wrap:anywhere}
 .journey-main{min-width:0}.journey-mobile-jump{display:none}
@@ -56,5 +63,5 @@
 .journey-finish strong{font-size:18px;color:#1b2c48}.journey-finish p{font-size:14px;color:#65718b}.journey-finish button{font-weight:700;color:#4434cf}
 .journey-dialog :focus-visible{outline:3px solid #7563ef;outline-offset:3px}
 @media(max-width:920px){.journey-layout{grid-template-columns:minmax(210px,240px) minmax(0,1fr);gap:20px;padding:26px 18px}.journey-sidebar-inner{padding:18px 10px 18px 13px}.journey-article p,.journey-article li{font-size:15px}}
-@media(max-width:720px){.journey-layout{display:block;padding:22px 17px 44px}.journey-sidebar{display:none}.journey-mobile-jump{display:block;margin:0 0 22px;color:#394764;font-size:13px;font-weight:750}.journey-mobile-jump select{display:block;margin-top:7px;width:100%;min-width:0;max-width:100%;padding:12px;background:#fff;border:1px solid #d1d9ec;border-radius:10px;color:#263454;font-size:14px}.journey-hero{padding:32px 21px}.journey-hero h1{font-size:39px}.journey-tags span{font-size:11px}.journey-article h2{font-size:25px;padding-top:25px;margin-top:25px}.journey-article p,.journey-article li{font-size:15px;line-height:1.8}.journey-article td,.journey-article th{padding:10px 12px}.journey-reading{font-size:10px}.journey-finish{padding:20px}}
+@media(max-width:720px){.journey-sidebar{position:static}.journey-layout{display:block;padding:22px 17px 44px}.journey-sidebar{display:none}.journey-mobile-jump{display:block;margin:0 0 22px;color:#394764;font-size:13px;font-weight:750}.journey-mobile-jump select{display:block;margin-top:7px;width:100%;min-width:0;max-width:100%;padding:12px;background:#fff;border:1px solid #d1d9ec;border-radius:10px;color:#263454;font-size:14px}.journey-hero{padding:32px 21px}.journey-hero h1{font-size:39px}.journey-tags span{font-size:11px}.journey-article h2{font-size:25px;padding-top:25px;margin-top:25px}.journey-article p,.journey-article li{font-size:15px;line-height:1.8}.journey-article td,.journey-article th{padding:10px 12px}.journey-reading{font-size:10px}.journey-finish{padding:20px}}
 @media(prefers-reduced-motion:reduce){.journey-dialog *{scroll-behavior:auto!important;transition:none!important}}

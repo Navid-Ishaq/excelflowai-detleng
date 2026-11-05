@@ -41,7 +41,8 @@ export function openGuide(_actions,onClose) {
     </div>`;
   const dialog=shell.dialog;
   const root=shell.body;
-  const toc=[...root.querySelectorAll('.journey-chapters a')];
+  const chapterNav=root.querySelector('.journey-chapters');
+  const toc=[...chapterNav.querySelectorAll('a')];
   const find=root.querySelector('#journey-search');
   const jump=root.querySelector('#journey-jump');
   function goTo(id) {
@@ -57,19 +58,48 @@ export function openGuide(_actions,onClose) {
     const query=find.value.trim().toLocaleLowerCase();let count=0;
     toc.forEach(a=>{const visible=a.textContent.toLocaleLowerCase().includes(query);a.hidden=!visible;if(visible)count++;});
     root.querySelector('.journey-empty').hidden=count!==0;
+    if(!query)keepActiveVisible(toc.find(link=>link.dataset.chapter===currentChapter));
   });
   root.querySelector('#journey-top').onclick=()=>dialog.scrollTo({top:0,behavior:'smooth'});
+  // Moving the *document* updates the active chapter; moving the left list
+  // never scrolls the document. Preserve a user's chapter search/scroll.
   let scheduled=false;
+  let currentChapter='';
+  function keepActiveVisible(link){
+    if(!link||link.hidden)return;
+    const boundary=chapterNav.getBoundingClientRect();
+    const item=link.getBoundingClientRect();
+    const breathingRoom=12;
+    if(item.top<boundary.top+breathingRoom){
+      chapterNav.scrollTop+=item.top-boundary.top-breathingRoom;
+    }else if(item.bottom>boundary.bottom-breathingRoom){
+      chapterNav.scrollTop+=item.bottom-boundary.bottom+breathingRoom;
+    }
+  }
   const update=()=>{
     scheduled=false;
     const max=dialog.scrollHeight-dialog.clientHeight;
     const pct=max>0?Math.min(100,Math.max(0,Math.round(dialog.scrollTop/max*100))):100;
     root.querySelector('#journey-progress-bar').style.width=`${pct}%`;
     root.querySelector('#journey-progress-text').textContent=`${pct}% read`;
-    let active='';
-    for(const c of chapters){const element=root.querySelector(`#${CSS.escape(c.id)}`);if(element?.getBoundingClientRect().top<dialog.getBoundingClientRect().top+160)active=c.id;}
-    toc.forEach(a=>{if(a.dataset.chapter===active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});
-    if(active)jump.value=active;
+    // Use the nearest section already passing the reading line. While the
+    // hero is visible, keep Chapter 1 selected rather than no selection.
+    const readingLine=dialog.getBoundingClientRect().top+Math.min(210,dialog.clientHeight*.3);
+    let active=chapters[0]?.id||'';
+    for(const c of chapters){
+      const heading=root.querySelector(`#${CSS.escape(c.id)}`);
+      if(heading&&heading.getBoundingClientRect().top<=readingLine)active=c.id;
+    }
+    if(active!==currentChapter){
+      currentChapter=active;
+      let activeLink;
+      for(const link of toc){
+        const selected=link.dataset.chapter===active;
+        if(selected){link.setAttribute('aria-current','location');activeLink=link;}
+        else link.removeAttribute('aria-current');
+      }
+      if(active){jump.value=active;keepActiveVisible(activeLink);}
+    }
   };
   dialog.addEventListener('scroll',()=>{if(!scheduled){scheduled=true;requestAnimationFrame(update);}},{passive:true});
   update();
