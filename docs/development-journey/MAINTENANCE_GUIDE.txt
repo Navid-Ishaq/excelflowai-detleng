@@ -1,0 +1,68 @@
+EXCELFLOW AI — HOW TO BUILD CONTENT MAINTENANCE
+================================================
+
+Purpose
+-------
+This folder is the single source of truth for the public How to Build story.
+The website renders the Markdown at build time. The latest pushed document
+appears automatically after the GitHub Pages workflow has built and deployed.
+
+The content file
+----------------
+File: docs/development-journey/DEVELOPMENT_JOURNEY.md
+Do not rename or move this file. It is imported by src/how-to-build-view.js.
+
+To publish an update
+--------------------
+1. Open DEVELOPMENT_JOURNEY.md with VS Code or another plain-text editor.
+2. Edit the content, keeping the top title (# ...) and subtitle (## ...).
+3. Use ## for section/chapter headings; these appear in chapter navigation.
+4. Add a dated section at the END for every significant product change,
+   explaining what changed, why, which files changed and how it was tested.
+5. Save in UTF-8; review changes with git diff before committing.
+6. Run npm test and npm run build in the project directory.
+7. Commit and push to main. GitHub Actions then publishes the new reader.
+8. Open https://excelflowai.detleng.com/ and select How to Build. Check
+   navigation, tables, external links and mobile layout.
+
+Supported Markdown
+------------------
+# page title; ## chapters; ### subheadings; paragraphs and blank lines;
+**bold**, *italic*, `inline code`, - bullet lists, 1. numbered lists,
+> quotations, | Markdown tables |, --- dividers, fenced code blocks,
+[link text](https://example.com), and ![alt text](./docs/development-journey/picture.png).
+Raw HTML is not rendered, by design. External link URLs must start with
+http:// or https://. Local image/link paths must start with ./ .
+
+For images, place the files under public/docs/development-journey/ and use
+![Description](./docs/development-journey/filename.png) in the Markdown.
+Avoid uploading real private financial data, credentials or customer records.
+
+Important behavior
+------------------
+Do not edit src/how-to-build-view.js, src/how-to-build-markdown.js or
+src/how-to-build.css for a normal text update. These files define the UI.
+The Markdown is bundled by Vite: a browser refresh alone will NOT update an
+unpublished edit. Push the edit and allow the Pages build/deployment to run.
+The top menu opens the reader; the Automation Desk link opens a new tab.
+Shareable reader URL: https://excelflowai.detleng.com/#how-to-build
+The source README and product/AI runtime remain unchanged by text edits.
+
+Future replacements
+-------------------
+You may replace the Markdown body with another UTF-8 Markdown file, provided
+you keep the EXACT filename and the # title followed by ## subtitle. Use ##
+for navigation chapters. The reader picks up the content after the next build.
+If you add novel Markdown syntax, images, custom layouts or embedded media,
+verify that the restricted reader supports them before publishing.
+
+Useful locations
+----------------
+docs/development-journey/DEVELOPMENT_JOURNEY.md   document content
+docs/development-journey/MAINTENANCE_GUIDE.txt   editing instructions
+src/how-to-build-view.js                        reader interactions
+src/how-to-build-markdown.js                    safe Markdown parsing
+src/how-to-build.css                            presentation
+tests/how-to-build.test.js                      non-browser rendering tests
+index.html                                      navigation entries
+src/app.js                                      open/close wiring
