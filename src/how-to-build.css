@@ -31,6 +31,12 @@
 .journey-empty{font-size:13px;margin:14px 8px;color:#6c7484}
 .journey-source{display:block;margin-top:18px;padding:14px 8px 2px;border-top:1px solid #e1e6f2;color:#4435c8;font-size:13px;font-weight:700;overflow-wrap:anywhere}
 .journey-main{min-width:0}.journey-mobile-jump{display:none}
+/* The dialog scrolls the document, while its own close header remains sticky.
+   Keep this reading indicator beneath that header, inside the document column.
+   --journey-sticky-top is measured from the real header height in JS. */
+.journey-reading-sticky{position:sticky;top:var(--journey-sticky-top,90px);z-index:2;min-width:0;padding:12px 0 13px;margin:-12px 0 24px;background:#f5f7fc;border-bottom:1px solid #e0e6f2;box-shadow:0 7px 12px -12px #18243e40}
+.journey-reading-sticky .journey-progress{margin-bottom:0}
+
 .journey-reading{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:#78839b;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
 .journey-progress{height:5px;border-radius:12px;background:#e0e6f4;overflow:hidden;margin-bottom:30px}
 .journey-progress>div{width:0;height:100%;background:linear-gradient(90deg,#5d4bdb,#9789f7);transition:width .12s linear}

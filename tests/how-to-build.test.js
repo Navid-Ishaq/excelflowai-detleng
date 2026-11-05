@@ -46,3 +46,15 @@ test('desktop sidebar stays sticky while the chapter links scroll independently'
   assert.match(view,/dialog\.addEventListener\('scroll'/);
   assert.match(markdown,/Persistent chapter navigation/);
 });
+
+test('reading progress stays below the dialog header while its value updates',()=>{
+  const css=readFileSync(new URL('../src/how-to-build.css',import.meta.url),'utf8');
+  const view=readFileSync(new URL('../src/how-to-build-view.js',import.meta.url),'utf8');
+  assert.match(css,/\.journey-reading-sticky\{position:sticky;top:var\(--journey-sticky-top/);
+  assert.match(view,/class="journey-reading-sticky"/);
+  assert.match(view,/const readingOffset=\(\)=>closeHeader\.offsetHeight\+topBar\.offsetHeight/);
+  assert.match(view,/ResizeObserver\(refreshStickyTop\)/);
+  assert.match(view,/setAttribute\('aria-valuenow',String\(pct\)\)/);
+  assert.match(view,/dialog\.addEventListener\('scroll'/);
+  assert.match(markdown,/permanently visible reading progress bar/);
+});

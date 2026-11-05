@@ -76,3 +76,16 @@ as the reader scrolls the main document and automatically moved into the
 visible part of the chapter list when necessary. On mobile, the compact
 chapter dropdown is used instead. Content-only Markdown replacements
 need no JavaScript or CSS changes.
+
+Sticky reading progress — 5 November 2026, 02:55 CET
+----------------------------------------------------
+The right-hand documentation column has a persistent top heading, percentage
+and purple progress line. They remain visible while the dialog document
+scrolls, below the dialog's existing close header. The left chapter panel is
+independently sticky and its active link remains highlighted and visible.
+Chapter jumps leave room for both sticky bars, including on mobile where the
+left chapter list becomes a compact dropdown. The percent refers to document
+scroll progress, and the progress element has an accessible current value.
+Replacing DEVELOPMENT_JOURNEY.md later requires no change to these controls.
+Only edit the How to Build modules for future UX work; do not change reporting
+engines, Mastra tools or the server for a documentation-only update.

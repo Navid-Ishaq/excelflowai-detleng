@@ -33,8 +33,10 @@ export function openGuide(_actions,onClose) {
         <label class="journey-mobile-jump" for="journey-jump">Jump to a chapter
           <select id="journey-jump">${chapters.map((c,i)=>`<option value="${c.id}">${i+1}. ${esc(c.label.replace(/^\d+\.\s*/,''))}</option>`).join('')}</select>
         </label>
-        <div class="journey-reading"><span>DOCUMENTATION · LIVE FROM THE REPOSITORY BUILD</span><span id="journey-progress-text" aria-live="off">0% read</span></div>
-        <div class="journey-progress"><div id="journey-progress-bar"></div></div>
+        <div class="journey-reading-sticky" aria-label="Document reading progress">
+          <div class="journey-reading"><span>DOCUMENTATION · LIVE FROM THE REPOSITORY BUILD</span><span id="journey-progress-text" aria-live="off">0% read</span></div>
+          <div class="journey-progress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="journey-progress-bar"></div></div>
+        </div>
         <article class="journey-article">${html}</article>
         <div class="journey-finish"><strong>You have reached the end of the development journey.</strong><p>Updates appear here when the Markdown file is revised and the website is rebuilt.</p><button type="button" id="journey-top">↑ Back to top</button></div>
       </div>
@@ -42,13 +44,23 @@ export function openGuide(_actions,onClose) {
   const dialog=shell.dialog;
   const root=shell.body;
   const chapterNav=root.querySelector('.journey-chapters');
+  const topBar=root.querySelector('.journey-reading-sticky');
+  const closeHeader=dialog.querySelector('.experience-header');
+  // Keep the progress bar immediately below the *actual* dialog header.
+  // A ResizeObserver also handles a wrapped close button or device resize.
+  const refreshStickyTop=()=>dialog.style.setProperty('--journey-sticky-top',`${closeHeader.offsetHeight+2}px`);
+  refreshStickyTop();
+  const headerObserver=typeof ResizeObserver==='undefined'?null:new ResizeObserver(refreshStickyTop);
+  headerObserver?.observe(closeHeader);
+  dialog.addEventListener('close',()=>headerObserver?.disconnect(),{once:true});
+  const readingOffset=()=>closeHeader.offsetHeight+topBar.offsetHeight+18;
   const toc=[...chapterNav.querySelectorAll('a')];
   const find=root.querySelector('#journey-search');
   const jump=root.querySelector('#journey-jump');
   function goTo(id) {
     const target=root.querySelector(`#${CSS.escape(id)}`);
     if(!target)return;
-    const top=target.getBoundingClientRect().top-dialog.getBoundingClientRect().top+dialog.scrollTop-95;
+    const top=target.getBoundingClientRect().top-dialog.getBoundingClientRect().top+dialog.scrollTop-readingOffset();
     dialog.scrollTo({top,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
     history.replaceState(null,'',`#how-to-build`);
   }
@@ -81,10 +93,11 @@ export function openGuide(_actions,onClose) {
     const max=dialog.scrollHeight-dialog.clientHeight;
     const pct=max>0?Math.min(100,Math.max(0,Math.round(dialog.scrollTop/max*100))):100;
     root.querySelector('#journey-progress-bar').style.width=`${pct}%`;
+    root.querySelector('.journey-progress').setAttribute('aria-valuenow',String(pct));
     root.querySelector('#journey-progress-text').textContent=`${pct}% read`;
     // Use the nearest section already passing the reading line. While the
     // hero is visible, keep Chapter 1 selected rather than no selection.
-    const readingLine=dialog.getBoundingClientRect().top+Math.min(210,dialog.clientHeight*.3);
+    const readingLine=dialog.getBoundingClientRect().top+readingOffset()+22;
     let active=chapters[0]?.id||'';
     for(const c of chapters){
       const heading=root.querySelector(`#${CSS.escape(c.id)}`);
