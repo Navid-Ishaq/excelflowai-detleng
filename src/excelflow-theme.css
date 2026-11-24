@@ -15,3 +15,10 @@ body .builder-template:has(input:checked){background:#f0efff;border-color:var(--
 body .story-turn{background:linear-gradient(135deg,#eeedff,#f6f7ff)}
 
 .sample-entry{margin-top:20px}.sample-entry p{font-size:14px;margin:8px 0;color:var(--muted)}.sample-entry #sample-status:empty{display:none}.sample-entry #sample-status{color:var(--ink)}
+
+/* Official video: local poster, no external player until the guide opens. */
+.nav nav button.video-guide-entry{background:var(--teal,#4935d8);color:white;border-color:transparent;font-weight:700;white-space:normal}
+.hero-demo .video-guide-poster{position:relative;width:100%;display:block;padding:0;overflow:hidden;border-radius:14px;border:1px solid var(--line);background:#102c26;line-height:0;aspect-ratio:16/9;cursor:pointer}
+.video-guide-poster img{display:block;width:100%;height:100%;object-fit:cover}
+.video-guide-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;place-items:center;background:#e60024;color:white;border:2px solid #fff;border-radius:14px;width:68px;height:48px;font-size:25px;line-height:1;box-shadow:0 4px 20px #0008}
+.hero-demo .video-guide-cta{width:100%;margin-top:12px;white-space:normal;text-align:center}

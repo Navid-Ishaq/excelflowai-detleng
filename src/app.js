@@ -94,7 +94,7 @@ const informationActions={build:startBuilder,create:start,explore:startExisting,
 async function openInformation(kind){
  if(informationOpen)return;informationOpen=true;
  try{
-  const module=kind==='technical'?await import('./technical-view.js'):kind==='journey'?await import('./how-to-build-view.js'):await import('./guide-view.js');
+  const module=kind==='technical'?await import('./technical-view.js'):kind==='journey'?await import('./how-to-build-view.js'):kind==='video'?await import('./video-guide-view.js'):await import('./guide-view.js');
   module.openGuide(informationActions,()=>informationOpen=false);
  }catch(e){informationOpen=false;console.error(e);}
 }
@@ -106,3 +106,10 @@ document.querySelectorAll('.technical-guide-entry').forEach(button=>button.addEv
 // Documentation stays separate from all workbook/analytics controllers.
 document.querySelectorAll('.how-to-build-entry').forEach(button=>button.addEventListener('click',()=>{closeMenu();history.replaceState(null,'','#how-to-build');openInformation('journey');}));
 if(location.hash==='#how-to-build')openInformation('journey');
+
+// Opening the video guide must not navigate away from an active report.
+document.querySelectorAll('.video-guide-entry').forEach(button=>button.addEventListener('click',()=>{
+ const mobileMenu=$('menu').getAttribute('aria-expanded')==='true';
+ closeMenu();if(mobileMenu)$('menu').focus({preventScroll:true});
+ openInformation('video');
+}));
